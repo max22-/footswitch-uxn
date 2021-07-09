@@ -26,13 +26,10 @@ static void system_talk(Device *d, Uint8 b0, Uint8 w) {
 }
 
 static void pin_talk(Device *d, Uint8 b0, Uint8 w) {
-  //Serial.printf("pin_talk(*d, %d, %d)\n", b0, w);
   if (b0 == 3)
     pinMode(d->dat[0x2], d->dat[0x3]);
-  else if (b0 == 5 && w) {
+  else if (b0 == 5 && w)
     digitalWrite(d->dat[0x2], d->dat[0x5]);
-    //Serial.printf("digitalWrite(%d, %s)\n", d->dat[2], d->dat[5] ? "HIGH" : "LOW");
-  }
   else if (b0 == 4 && !w)
 	  d->dat[0x4] = digitalRead(d->dat[0x2]);
   (void)b0;
@@ -46,7 +43,6 @@ static void time_talk(Device *d, Uint8 b0, Uint8 w) {
 static void console_talk(Device *d, Uint8 b0, Uint8 w) {
   if (w && b0 == 8)
     Serial.write(d->dat[8]);
-#warning Signed or unsigned char ???
 }
 
 static void nil_talk(Device *d, Uint8 b0, Uint8 w) {
