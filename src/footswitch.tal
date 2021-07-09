@@ -1,6 +1,14 @@
-( dev/console )
+%LED { #11 }		( PC13 = pin number 17 --> #11 in hex )
+%OUTPUT { #01 }
+%LOW { #00 }
+%HIGH { #01 }
 
-|18 @Console/write
+%PERIOD { #03e8 }
+
+
+|10 @Console    [ &vector $2 &read     $1 &pad    	$5 &write	$1 ]
+|c0 @Pin	    [ &vector $2 &number   $1 &mode 	$1 &digitalRead	$1 &digitalWrite 	$1 ]
+|d0 @Time		[ &vector $2 &millis $2 ]
 
 ( init )
 
@@ -13,7 +21,18 @@
 		( incr ) #0001 ADD2
 		( loop ) LDAk ,&loop JCN
 	POP2
-	
+
+	LED .Pin/number DEO
+	OUTPUT .Pin/mode DEO
+	LOW .Pin/digitalWrite DEO
+	;on-millis .Time/vector DEO2
+BRK
+
+@on-millis
+	.Time/millis DEI2 DUP2 PERIOD DIV2 PERIOD MUL2 SUB2 PERIOD #0002 DIV2 GTH2 ,&l JCN
+	HIGH .Pin/digitalWrite DEO BRK
+	&l	
+	LOW .Pin/digitalWrite DEO
 BRK
 
 @hello-word "Hello 20 "World!

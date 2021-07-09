@@ -48,5 +48,6 @@ Uint16 mempeek16(Uint8 *m, Uint16 a);
 
 int loaduxn(Uxn *c, char *filepath);
 int bootuxn(Uxn *c);
+int stepuxn(Uxn *u, Uint8 instr);	/* Added this export to be able to debug step by step */
 int evaluxn(Uxn *u, Uint16 vec);
 Device *portuxn(Uxn *u, Uint8 id, char *name, void (*talkfn)(Device *, Uint8, Uint8));
