@@ -1,38 +1,75 @@
-%LED { #11 }		( PC13 = pin number 17 --> #11 in hex )
+( Uxn macros )
+%RTN { JMP2r }
+%PICK
+
+( Arduino stuff )
+%INPUT { #00 }
 %OUTPUT { #01 }
+%INPUT_PULLUP { #02 }
+%INPUT_PULLDOWN { #03 }
+%INPUT_ANALOG { #04 }
 %LOW { #00 }
 %HIGH { #01 }
+%PINMODE { .Pin/number DEO .Pin/mode DEO } ( mode pinNumber -- )
+%DIGITALWRITE { .Pin/number DEO .Pin/digitalWrite DEO } ( value pinNumber -- ) 
+%DIGITALREAD { .Pin/number DEO .Pin/digitalRead DEI } ( pinNumber -- value )
 
-%PERIOD { #03e8 }
+( Bluepill stuff )
+%PC13 { #11 }
+%PB9 { #00 }
+%PB8 { #01 }
+%PB7 { #02 }
+%PB6 { #03 }
+%PB5 { #04 }
+%PB4 { #05 }
 
+( Config )
+%LED { PC13 }		( PC13 = pin number 17 --> #11 in hex )
+%BUTTON1 { PB9 }
+%BUTTON2 { PB8 }
+%BUTTON3 { PB7 }
+%BUTTON4 { PB6 }
+%BUTTON5 { PB5 }
+%BUTTON6 { PB4 }
+
+( Devices )
 
 |10 @Console    [ &vector $2 &read     $1 &pad    	$5 &write	$1 ]
 |c0 @Pin	    [ &vector $2 &number   $1 &mode 	$1 &digitalRead	$1 &digitalWrite 	$1 ]
-|d0 @Time		[ &vector $2 &millis $2 ]
+|d0 @Clock		[ &vector $2 &millis $2 ]
 
-( init )
 
 |0100 ( -> )
 	
-	;hello-word 
+	;setup JSR2
+	;loop .Clock/vector DEO2
 
-	&loop
-		( send ) LDAk .Console/write DEO
-		( incr ) #0001 ADD2
-		( loop ) LDAk ,&loop JCN
-	POP2
-
-	LED .Pin/number DEO
-	OUTPUT .Pin/mode DEO
-	LOW .Pin/digitalWrite DEO
-	;on-millis .Time/vector DEO2
 BRK
 
-@on-millis
-	.Time/millis DEI2 DUP2 PERIOD DIV2 PERIOD MUL2 SUB2 PERIOD #0002 DIV2 GTH2 ,&l JCN
-	HIGH .Pin/digitalWrite DEO BRK
-	&l	
-	LOW .Pin/digitalWrite DEO
+@setup
+	OUTPUT LED PINMODE
+	INPUT_PULLUP BUTTON1 PINMODE
+RTN
+
+@loop
+
+	BUTTON1 DIGITALREAD LOW NEQ ,&end JCN
+	#42 .Console/write DEO #0a .Console/write DEO
+
+	( debounce )
+	#0014 ;delay JSR2
+
+	&waitRelease
+	BUTTON1 DIGITALREAD LOW EQU ,&waitRelease JCN
+
+	#0014 ;delay JSR2
+
+	&end
 BRK
 
-@hello-word "Hello 20 "World!
+@delay
+	.Clock/millis DEI2 SWP2
+	&clockLoop
+	OVR2 .Clock/millis DEI2 SWP2 SUB2 OVR2 LTH2 ,&clockLoop JCN
+	POP2 POP2
+RTN
