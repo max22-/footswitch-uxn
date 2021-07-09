@@ -31,13 +31,13 @@ static void pin_talk(Device *d, Uint8 b0, Uint8 w) {
   else if (b0 == 5 && w)
     digitalWrite(d->dat[0x2], d->dat[0x5]);
   else if (b0 == 4 && !w)
-	  d->dat[0x4] = digitalRead(d->dat[0x2]);
+    d->dat[0x4] = digitalRead(d->dat[0x2]);
   (void)b0;
 }
 
 static void time_talk(Device *d, Uint8 b0, Uint8 w) {
   if (!w && b0 == 2)
-	  mempoke16(d->dat, 0x02, (Uint16)millis());
+    mempoke16(d->dat, 0x02, (Uint16)millis());
 }
 
 static void console_talk(Device *d, Uint8 b0, Uint8 w) {
