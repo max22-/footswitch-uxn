@@ -35,7 +35,7 @@ static void pin_talk(Device *d, Uint8 b0, Uint8 w) {
   (void)b0;
 }
 
-static void time_talk(Device *d, Uint8 b0, Uint8 w) {
+static void clock_talk(Device *d, Uint8 b0, Uint8 w) {
   if (!w && b0 == 2)
     mempoke16(d->dat, 0x02, (Uint16)millis());
 }
@@ -64,9 +64,10 @@ int evaluxn_debug(Uxn *u, Uint16 vec) {
   u->ram.ptr = vec;
   u->wst.error = 0;
   u->rst.error = 0;
-  Serial.printf("*** eval(%x) ***\n", vec);
+  Serial.printf("*** eval(0x%x) ***\n", vec);
   while (u->ram.ptr) {
     Serial.println("* step");
+	Serial.printf(" opcode = 0x%02x\n", u->ram.dat[u->ram.ptr]);
     Serial.println("  Stack :");
     for (int i = 0; i < 20; i++)
       Serial.printf("%02x ", u->wst.dat[i]);
@@ -114,19 +115,13 @@ void setup() {
   portuxn(u, 0xa, (char *)"---", nil_talk);
   portuxn(u, 0xb, (char *)"---", nil_talk);
   portuxn(u, 0xc, (char *)"pin", pin_talk);
-  devtime = portuxn(u, 0xd, (char *)"time", time_talk);
+  devtime = portuxn(u, 0xd, (char *)"clock", clock_talk);
   portuxn(u, 0xe, (char *)"---", nil_talk);
   portuxn(u, 0xf, (char *)"---", nil_talk);
   evaluxn(u, 0x0100);
 }
 
 void loop() {
-  static uint32_t oldMillis = millis();
-  uint32_t newMillis = millis();
-
-  if (newMillis != oldMillis) {
-    if (!evaluxn(u, mempeek16(devtime->dat, 0)))
-      error("Eval", "error");
-    oldMillis = newMillis;
-  }
+	if(!evaluxn(u, mempeek16(devtime->dat, 0)))
+		error("Eval", "error");
 }
