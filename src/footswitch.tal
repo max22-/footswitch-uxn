@@ -23,7 +23,7 @@
 %PB4 { #05 }
 
 ( Config )
-%LED { PC13 }		( PC13 = pin number 17 --> #11 in hex )
+%LED { PC13 }
 %BUTTON1 { PB9 }
 %BUTTON2 { PB8 }
 %BUTTON3 { PB7 }
