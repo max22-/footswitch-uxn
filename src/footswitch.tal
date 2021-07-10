@@ -1,6 +1,5 @@
 ( Uxn macros )
 %RTN { JMP2r }
-%PICK
 
 ( Arduino stuff )
 %INPUT { #00 }
@@ -31,6 +30,7 @@
 %BUTTON4 { PB6 }
 %BUTTON5 { PB5 }
 %BUTTON6 { PB4 }
+%DEBOUNCE-DELAY { #0014 } ( 20 ms )
 
 ( Devices )
 
@@ -40,8 +40,8 @@
 
 
 |0100 ( -> )
-	
-	;setup JSR2
+       
+ 	;setup JSR2
 	;loop .Clock/vector DEO2
 
 BRK
@@ -58,19 +58,40 @@ RTN
 
 @loop
 
-	BUTTON1 DIGITALREAD LOW NEQ ,&end JCN
-	#42 .Console/write DEO #0a .Console/write DEO
+	;callback1 BUTTON1 ;read-button JSR2
+	;callback2 BUTTON2 ;read-button JSR2
+
+BRK
+
+@read-button ( callback pinNumber -- )
+    
+	DUP DIGITALREAD LOW EQU ,&call JCN
+        POP POP2 ,&end JMP ( callback pinNumber -- )
+        &call
+        ROT ROT ( callback pinNumber -- pinNumber callback )
+        JSR2 ( pinNumber callback -- pinNumber )
 
 	( debounce )
-	#0014 ;delay JSR2
+	DEBOUNCE-DELAY ;delay JSR2
 
-	&waitRelease
-	BUTTON1 DIGITALREAD LOW EQU ,&waitRelease JCN
+	&waitRelease ( pinNumber -- pinNumber )
 
-	#0014 ;delay JSR2
+    DUP (pinNumber -- pinNumber pinNumber )
+	DIGITALREAD LOW EQU ,&waitRelease JCN ( pinNumber pinNumber -- pinNumber )
 
-	&end
-BRK
+    POP ( pinNumber -- )
+	DEBOUNCE-DELAY ;delay JSR2
+
+    &end
+RTN
+
+@callback1
+	#41 .Console/write DEO #0a .Console/write DEO
+RTN
+
+@callback2
+	#42 .Console/write DEO #0a .Console/write DEO
+RTN
 
 @delay ( ms -- )
 	.Clock/millis DEI2 SWP2
