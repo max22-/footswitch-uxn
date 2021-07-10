@@ -66,10 +66,10 @@ BRK
 @read-button ( callback pinNumber -- )
     
 	DUP DIGITALREAD LOW EQU ,&call JCN
-        POP POP2 ,&end JMP ( callback pinNumber -- )
-        &call
-        ROT ROT ( callback pinNumber -- pinNumber callback )
-        JSR2 ( pinNumber callback -- pinNumber )
+	POP POP2 ,&end JMP ( callback pinNumber -- )
+	&call
+	ROT ROT ( callback pinNumber -- pinNumber callback )
+	JSR2 ( pinNumber callback -- pinNumber )
 
 	( debounce )
 	DEBOUNCE-DELAY ;delay JSR2
