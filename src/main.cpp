@@ -5,11 +5,14 @@ extern "C" {
 #include <uxn.h>
 }
 
+#define DEBUG
+//#define DEBUG(args...) Serial.printf(args)
+
 Uxn *u;
 static Device *devconsole, *devtime;
 
 void error(const char *msg, const char *err) {
-  Serial.printf("Error %s: %s\n", msg, err);
+  DEBUG("Error %s: %s\n", msg, err);
   for (;;)
     ;
 }
@@ -56,45 +59,12 @@ int loaduxn_from_flash(Uxn *u, void *rom, size_t size) {
   if (rom == nullptr)
     error("Rom", "Invalid source address.");
   memcpy(u->ram.dat + PAGE_PROGRAM, rom, size);
-  fprintf(stderr, "Uxn loaded[0x%x].\n", (unsigned int)rom);
-  return 1;
-}
-
-int evaluxn_debug(Uxn *u, Uint16 vec) {
-  u->ram.ptr = vec;
-  u->wst.error = 0;
-  u->rst.error = 0;
-  Serial.printf("*** eval(0x%x) ***\n", vec);
-  while (u->ram.ptr) {
-    Serial.println("* step");
-	Serial.printf(" opcode = 0x%02x\n", u->ram.dat[u->ram.ptr]);
-    Serial.println("  Stack :");
-    for (int i = 0; i < 20; i++)
-      Serial.printf("%02x ", u->wst.dat[i]);
-    Serial.println();
-    for (int i = 0; i < 20; i++)
-      if (i == u->wst.ptr)
-        Serial.print("^  ");
-      else
-        Serial.print("   ");
-    Serial.println();
-    if (!stepuxn(u, u->ram.dat[u->ram.ptr++]))
-      return 0;
-    delay(1000);
-  }
-  Serial.printf("*** end eval ***");
-  delay(5000);
-  for (;;)
-    ;
+  DEBUG("Uxn loaded[0x%x].\n", (unsigned int)rom);
   return 1;
 }
 
 void setup() {
-  Serial.begin(115200);
-  for (int i = 5; i >= 0; i--) {
-    Serial.println(i);
-    delay(1000);
-  }
+  Serial.begin(31250);
   if ((u = (Uxn *)malloc(sizeof(Uxn))) == nullptr)
     error("Memory", "not enough");
   if (!bootuxn(u))
@@ -124,4 +94,5 @@ void setup() {
 void loop() {
 	if(!evaluxn(u, mempeek16(devtime->dat, 0)))
 		error("Eval", "error");
+  
 }
