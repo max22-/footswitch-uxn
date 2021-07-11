@@ -22,14 +22,17 @@
 %PB5 { #04 }
 %PB4 { #05 }
 
+( Midi )
+%PC { #c0 ADD .Console/write DEO .Console/write DEO } ( channel program -- )
+
 ( Config )
 %LED { PC13 }
-%BUTTON1 { PB9 }
-%BUTTON2 { PB8 }
-%BUTTON3 { PB7 }
-%BUTTON4 { PB6 }
-%BUTTON5 { PB5 }
-%BUTTON6 { PB4 }
+%BUTTON0 { PB9 }
+%BUTTON1 { PB8 }
+%BUTTON2 { PB7 }
+%BUTTON3 { PB6 }
+%BUTTON4 { PB5 }
+%BUTTON5 { PB4 }
 %DEBOUNCE-DELAY { #0014 } ( 20 ms )
 
 ( Devices )
@@ -48,20 +51,23 @@ BRK
 
 @setup
 	OUTPUT LED PINMODE
+	INPUT_PULLUP BUTTON0 PINMODE
 	INPUT_PULLUP BUTTON1 PINMODE
 	INPUT_PULLUP BUTTON2 PINMODE
 	INPUT_PULLUP BUTTON3 PINMODE
 	INPUT_PULLUP BUTTON4 PINMODE
 	INPUT_PULLUP BUTTON5 PINMODE
-	INPUT_PULLUP BUTTON6 PINMODE
 RTN
 
 @loop
-
+	;callback0 BUTTON0 ;read-button JSR2
 	;callback1 BUTTON1 ;read-button JSR2
 	;callback2 BUTTON2 ;read-button JSR2
-
+	;callback3 BUTTON3 ;read-button JSR2
+	;callback4 BUTTON4 ;read-button JSR2
+	;callback5 BUTTON5 ;read-button JSR2
 BRK
+
 
 @read-button ( callback pinNumber -- )
     
@@ -83,14 +89,32 @@ BRK
 	DEBOUNCE-DELAY ;delay JSR2
 
     &end
+
+RTN
+
+
+@callback0
+	#00 #00 PC	( program change, channel 0, program 0 )
 RTN
 
 @callback1
-	#41 .Console/write DEO #0a .Console/write DEO
+	#00 #01 PC
 RTN
 
 @callback2
-	#42 .Console/write DEO #0a .Console/write DEO
+	#00 #02 PC
+RTN
+
+@callback3
+	#00 #03 PC
+RTN
+
+@callback4
+	#00 #03 PC
+RTN
+
+@callback5
+	#00 #03 PC
 RTN
 
 @delay ( ms -- )
