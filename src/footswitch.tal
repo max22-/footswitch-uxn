@@ -23,7 +23,7 @@
 %PB4 { #05 }
 
 ( Midi )
-%PC { #c0 ADD .Console/write DEO .Console/write DEO } ( channel program -- )
+%PC { SWP #c0 ADD .Console/write DEO .Console/write DEO } ( channel program -- )
 
 ( Config )
 %LED { PC13 }
