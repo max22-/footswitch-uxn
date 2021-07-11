@@ -110,11 +110,11 @@ RTN
 RTN
 
 @callback4
-	#00 #03 PC
+	#00 #04 PC
 RTN
 
 @callback5
-	#00 #03 PC
+	#00 #05 PC
 RTN
 
 @delay ( ms -- )
