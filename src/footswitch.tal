@@ -51,6 +51,7 @@ BRK
 
 @setup
 	OUTPUT LED PINMODE
+	HIGH LED DIGITALWRITE
 	INPUT_PULLUP BUTTON0 PINMODE
 	INPUT_PULLUP BUTTON1 PINMODE
 	INPUT_PULLUP BUTTON2 PINMODE
@@ -74,6 +75,7 @@ BRK
 	DUP DIGITALREAD LOW EQU ,&call JCN
 	POP POP2 ,&end JMP ( callback pinNumber -- )
 	&call
+	LOW LED DIGITALWRITE
 	ROT ROT ( callback pinNumber -- pinNumber callback )
 	JSR2 ( pinNumber callback -- pinNumber )
 
@@ -87,6 +89,8 @@ BRK
 
     POP ( pinNumber -- )
 	DEBOUNCE-DELAY ;delay JSR2
+
+	HIGH LED DIGITALWRITE
 
     &end
 
